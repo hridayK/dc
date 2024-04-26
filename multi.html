@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multithreading</title>
+</head>
+<body>
+<pre>
+# server.py
+
+import socket
+import threading
+
+address = 'localhost'
+port = 4505
+
+op1=-1
+op2=-1
+
+def product(a,b):
+    global op1
+    op1=a*b
+
+def sum(a,b):
+    global op2
+    op2=a+b
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.bind((address,port))
+    server_socket.listen()
+    client_socket, client_address = server_socket.accept()
+    input = client_socket.recv(1024).decode()
+    a,b = input.split(',')
+    a = int(a)
+    b=int(b)
+
+    t1 = threading.Thread(target=product, args=(a,b,))
+    t2 = threading.Thread(target=sum, args=(a,b,))
+    
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+
+    output = f"Product calculated from thread1 is: {op1}\nSum calculated from thread2 is: {op2}"
+
+    client_socket.sendall(output.encode())
+    client_socket.close()
+server_socket.close()
+    
+# client.py
+
+import socket
+
+print('Enter two numbers:')
+a = int(input('\n'))
+b = int(input('\n'))
+
+input = f'{a},{b}'
+
+address = 'localhost'
+port = 4505
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+    client_socket.connect((address,port))
+    client_socket.sendall(input.encode())
+    output = client_socket.recv(1024).decode()
+    print(output)
+    client_socket.close()
+    
+</pre>
+</body>
+</html>
