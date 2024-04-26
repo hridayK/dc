@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Average</title>
+</head>
+<body>
+<pre>
+from datetime import datetime, timedelta
+
+
+def cal_globalavg(times , agree):
+    diff_time = []
+    sum_ot = 0
+    for time in times:
+        time_sec = (time.hour*3600 + time.minute*60)
+        agree_sec = (agree.hour*3600 + agree.minute*60)
+        diff = time_sec - agree_sec
+        print(diff)
+        ot = timedelta(seconds=abs(diff))
+        print(ot)
+        ot_time = datetime.strptime(str(ot) , "%H:%M:%S")
+
+        if diff >=0:
+            sum_ot += ot_time.minute
+            diff_time.append(ot)
+        else:
+            diff_time.append(ot*-1)
+            sum_ot -= ot_time.minute
+
+    print("MINUTE SUM",sum_ot)
+
+    print(diff_time)
+    avg = float(sum_ot/(len(diff_time)))
+    print("average",avg)
+    print("CURRENT TIME",time_sec)
+    print("avg seconds ",  avg * 60)
+    avg_sec = avg * 60
+
+    final_seconds = time_sec - avg_sec
+    final_time = timedelta(seconds=abs(final_seconds))
+
+    return final_time
+
+
+a_time = ['10:10','10:15','10:20','10:25']
+d_time = ['10:15','10:20','10:25','10:30']
+agree_time = '10:15'
+
+send_time  = [datetime.strptime(i, "%H:%M").time() for i in a_time]
+
+send_time2  = [datetime.strptime(i, "%H:%M").time() for i in d_time]
+
+print(send_time)
+
+print(cal_globalavg(send_time,datetime.strptime(agree_time, "%H:%M").time()))
+
+print(cal_globalavg(send_time2,datetime.strptime(agree_time, "%H:%M").time()))
+</pre>
+</body>
+</html>

@@ -6,8 +6,56 @@
     <title>IPC</title>
 </head>
 <body>
-    <pre>
-        
-    </pre>
+<pre>
+# server.py
+
+import socket
+
+server_socket = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+
+server_socket.bind(('localhost' , 8888))
+
+server_socket.listen(2)
+while True:
+    try:
+        client_socket , client_address = server_socket.accept()
+        print(f'Connection from {client_address}')
+
+        msg = client_socket.recv(1024).decode('utf -8')
+        print(msg)
+        print("Got message adding to it")
+
+        msg_server = "hello from server"
+        client_socket.sendall(msg_server.encode('utf-8'))
+    except Exception as e:
+        print("Error ",e)
+    finally:
+        client_socket.close()
+        server_socket.close()
+        break
+
+# client.py
+
+import socket
+
+client_socket = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+
+try:
+    client_socket.connect(('localhost' , 8888))
+    msg = "hello server"
+    client_socket.sendall(msg.encode('utf-8'))
+except Exception as e:
+    print("Error",e)
+    client_socket.close()
+
+
+try:
+    rcvmsg =  client_socket.recv(1024).decode('utf-8')
+    print(rcvmsg)
+except:
+    print("failed")
+finally:
+    client_socket.close()
+</pre>
 </body>
 </html>
